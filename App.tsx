@@ -1,20 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import {
+  Camera,
+  useCameraDevice,
+  useCameraPermission,
+} from "react-native-vision-camera";
 
-export default function App() {
+import NoCameraDeviceError from "./components/NoCameraDeviceError";
+import PermissionsPage from "./components/PermissionsPage";
+import useIsAppInFocus from "./hooks/useIsAppInFocus";
+
+const CameraScreen = () => {
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const device = useCameraDevice("back");
+
+  const isFocused = useIsAppInFocus();
+
+  if (!hasPermission)
+    return <PermissionsPage requestPermission={requestPermission} />;
+
+  if (!device) return <NoCameraDeviceError />;
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Camera
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={isFocused}
+      />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 });
+
+export default CameraScreen;
